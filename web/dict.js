@@ -284,4 +284,10 @@ $(document).ready(function() {
 		removeSelection(); // Selection text remains. So to prevent again showing pop up
 		lastMove = event;
 	});
+
+	// Apparently touchcancel is fired in android kitkat+ instead of touchend
+	$('#viewer').on('touchcancel',function(e){
+		var event = lastMove.originalEvent;
+		showPopUp(event.touches[0]);
+	});
 });
