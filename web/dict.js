@@ -107,7 +107,7 @@ function showPopUp(event){
 
 			$.ajax({
 		        type: "POST",
-		        url: "http://"+langParam+".wikipedia.org/w/api.php?action=opensearch&format=json&prop=text&section=0&"+ "&search="+selectedText+"&limit=1" +"&callback=?",
+		        url: "https://"+langParam+".wikipedia.org/w/api.php?action=opensearch&format=json&prop=text&section=0&"+ "&search="+selectedText+"&limit=1" +"&callback=?",
 		        contentType: "application/json; charset=utf-8",
 		        async: false,
 		        dataType: "json",
@@ -146,7 +146,7 @@ function showPopUp(event){
 		        }
 		    });
 
-		    $.get( "http://api.pearson.com/v2/dictionaries/wordwise/entries?headword="+selectedText, function( data ) {
+		    $.get( "https://api.pearson.com/v2/dictionaries/wordwise/entries?headword="+selectedText, function( data ) {
 			  console.log(JSON.stringify(data));
 			  var results = data.results;
 
