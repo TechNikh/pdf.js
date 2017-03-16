@@ -24,23 +24,53 @@ See https://github.com/adobe-type-tools/cmap-resources
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<!--#if GENERIC || CHROME-->
     <meta name="google" content="notranslate">
+<!--#endif-->
+<!--#if GENERIC-->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!--#endif-->
     <title>PDF.js viewer</title>
 
+<!--#if FIREFOX || MOZCENTRAL-->
+<!--#include viewer-snippet-firefox-extension.html-->
+<!--#endif-->
+<!--#if CHROME-->
+<!--#include viewer-snippet-chrome-extension.html-->
+<!--#endif-->
 
     <link rel="stylesheet" href="viewer.css">
+<!--#if !PRODUCTION-->
+    <link rel="resource" type="application/l10n" href="locale/locale.properties">
+<!--#endif-->
 
+<!--#if !PRODUCTION-->
+    <script src="../src/shared/compatibility.js"></script>
+<!--#endif-->
 
+<!--#if !PRODUCTION-->
+    <script src="../external/webL10n/l10n.js"></script>
+<!--#endif-->
 
+<!--#if !PRODUCTION-->
+    <script src="../node_modules/systemjs/dist/system.js"></script>
+    <script src="../systemjs.config.js"></script>
+<!--#endif-->
 
-<!-- This snippet is used in production (included from viewer.html) -->
-<link rel="resource" type="application/l10n" href="locale/locale.properties">
-<script src="l10n.js"></script>
-<script src="../build/pdf.js"></script>
+<!--#if (GENERIC && !MINIFIED) -->
+<!--#include viewer-snippet.html-->
+<!--#endif-->
 
-
+<!--#if !MINIFIED -->
     <script src="viewer.js"></script>
+<!--#else-->
+<!--#include viewer-snippet-minified.html-->
+<!--#endif-->
+
+<!-- Jquery added -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js" type="text/javascript"></script>
+<!-- shows brief meaning window of selected text -->
+<script src="dict.js"></script>
 
   </head>
 
@@ -329,6 +359,7 @@ See https://github.com/adobe-type-tools/cmap-resources
             </div>
           </div>
         </div>
+<!--#if !(FIREFOX || MOZCENTRAL)-->
         <div id="printServiceOverlay" class="container hidden">
           <div class="dialog">
             <div class="row">
@@ -343,10 +374,13 @@ See https://github.com/adobe-type-tools/cmap-resources
             </div>
           </div>
         </div>
+<!--#endif-->
+<!--#if CHROME-->
+<!--#include viewer-snippet-chrome-overlays.html-->
+<!--#endif-->
       </div>  <!-- overlayContainer -->
 
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
   </body>
 </html>
-
