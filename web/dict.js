@@ -6,6 +6,7 @@ var dictLink;
 var dictMeaning;
 var dictMeaningHead;
 var dictMeaningList;
+var dictRefresh;
 
 var viewer;
 
@@ -102,6 +103,7 @@ function mediaQuery(posX, posY){
 			});
 			dictWiki.css('width', '94%');
 			dictMeaning.css('width', '94%');
+			dictRefresh.css('display', 'inline-block');
 	  // Two windows visible		
 	  } else if(dictWiki.css('display') != 'none' || dictMeaning.css('display') != 'none') {
 		  	dict.css({
@@ -115,6 +117,7 @@ function mediaQuery(posX, posY){
 
 		  	dictWiki.css('width', '94%');
 			dictMeaning.css('width', '94%');
+			dictRefresh.css('display', 'inline-block');
 	  }
 	} 
 	// Desktop
@@ -265,12 +268,15 @@ $(document).ready(function() {
 	$('#outerContainer').append(
 		'<div id="dict">'+
 			'<div id="wiki">'+
-				'<div id="dict_heading"><h3></h3></div>'+
+				'<div id="dict_heading"><h3></h3>'+
+				'<img class="dict_refresh" src="https://cdn1.iconfinder.com/data/icons/material-core/16/refresh-128.png"/>'+
+				'</div>'+
 				'<div id="dict_description"></div>'+
 				'<div id="dict_link"></div>'+
 			'</div>'+
 			'<div id="dict_meaning">'+
 				'<h3></h3>'+
+				'<img class="dict_refresh" src="https://cdn1.iconfinder.com/data/icons/material-core/16/refresh-128.png"/>'+
 				'<ul>'+
 				'</ul>'+
 			'</div>'+
@@ -283,6 +289,7 @@ $(document).ready(function() {
 	 dictMeaning = $('#dict_meaning');
 	 dictMeaningHead = $('#dict_meaning').find('h3');
 	 dictMeaningList = $('#dict_meaning').find('ul');
+	 dictRefresh = $('.dict_refresh');
 	
 
 	 // Styling starts here
@@ -309,7 +316,8 @@ $(document).ready(function() {
 	});
 
 	dictHead.css({
-		'font-size': '1em'
+		'font-size': '1em',
+		display: 'inline-block'
 	});
 
 	dictDesc.css({
@@ -333,12 +341,20 @@ $(document).ready(function() {
 	});
 
 	dictMeaningHead.css({
-		'font-size': '1em'
+		'font-size': '1em',
+		display: 'inline-block',
 	});
 
 	dictMeaningList.css({
 		'margin-left': '10px',
 		padding: '10px'
+	});
+
+	dictRefresh.css({
+		height: '1.2em',
+		width: '1.2em',
+		display: 'none',
+		float: 'right'
 	});
 
 	// Events
@@ -360,6 +376,13 @@ $(document).ready(function() {
 
 	// Apparently touchcancel is fired in android kitkat+ instead of touchend
 	$('#viewer').on('touchcancel',function(e){
+		var event = lastMove.originalEvent;
+		showPopUp(event.touches[0]);
+	});
+
+	// Event fired on refresh button click
+	dictRefresh.on('click',function(e){
+		e.preventDefault();
 		var event = lastMove.originalEvent;
 		showPopUp(event.touches[0]);
 	});
