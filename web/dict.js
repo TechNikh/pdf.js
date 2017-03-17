@@ -12,6 +12,9 @@ var viewer;
 var xOffset;
 var yOffset;
 
+var xOffsetSmall;
+var yOffsetSmall;
+
 var lastMove = null;
 
 function getSelectedText(){
@@ -56,14 +59,18 @@ function isOnUp(e){
 function setoffsets(event){
 	if(isOnLeft(event)){
 		xOffset = 0;
+		xOffsetSmall = 10;
 	} else {
-		xOffset = -1*($(window).width())/2;
+		xOffset = -1*($(window).width())/2.8;
+		xOffsetSmall = -1*($(window).width())/3.8;
 	}
 
 	if(isOnUp(event)){
 		yOffset = 10;
+		yOffsetSmall = 10;
 	} else {
-		yOffset = -1*($(window).height())/2.8;
+		yOffset = -1*($(window).height())/3.4;
+		yOffsetSmall = -1*($(window).height())/3.5;
 	}
 }
 
@@ -76,6 +83,65 @@ function findGetParameter(parameterName) {
         if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
     }
     return result;
+}
+
+function mediaQuery(posX, posY){
+
+	// Mobile devices
+	if (window.matchMedia('(max-width: 768px)').matches)
+	{
+	    // Only one window visible
+	  if(dictWiki.css('display') != 'none' && dictMeaning.css('display') != 'none'){
+		  	dict.css({
+           		display:'inline-block',
+           		width: '70%',
+				top: posY+yOffset,
+				left: posX+xOffset,
+				'overflow-x': 'auto'
+				// 'white-space': 'nowrap'
+			});
+			dictWiki.css('width', '94%');
+			dictMeaning.css('width', '94%');
+	  // Two windows visible		
+	  } else if(dictWiki.css('display') != 'none' || dictMeaning.css('display') != 'none') {
+		  	dict.css({
+           		display:'inline-block',
+           		width: '70%',
+				top: posY+yOffsetSmall,
+				left: posX+xOffsetSmall,
+				'overflow-x': 'auto'
+				// 'white-space': 'nowrap'
+			});
+
+		  	dictWiki.css('width', '94%');
+			dictMeaning.css('width', '94%');
+	  }
+	} 
+	// Desktop
+	else{ 
+		// Only one window visible
+	  if(dictWiki.css('display') != 'none' && dictMeaning.css('display') != 'none'){
+		  	dict.css({
+           		display:'inline-block',
+           		width: '50%',
+				top: posY+yOffset,
+				left: posX+xOffset
+			});
+			dictWiki.css('width', '47%');
+			dictMeaning.css('width', '47%');
+	  // Two windows visible		
+	  } else if(dictWiki.css('display') != 'none' || dictMeaning.css('display') != 'none') {
+		  	dict.css({
+           		display:'inline-block',
+           		width: '25%',
+				top: posY+yOffsetSmall,
+				left: posX+xOffsetSmall
+			});
+
+		  	dictWiki.css('width', '94%');
+			dictMeaning.css('width', '94%');
+	  }
+	}
 }
 
 function showPopUp(event){
@@ -123,62 +189,68 @@ function showPopUp(event){
 		            console.log(description);
 		            
 	            	console.log("empty 0");
-	            	dict.css({
-		           		display:'inline-block',
-						top: posY+yOffset,
-						left: posX+xOffset
-					});
+	            	
 
 					dictHead.html("Wikipedia: " + heading);
 					dictDesc.html(description);
-					if(dictDesc.html() == ""){
-						dictDesc.html("No description found!");
-					}
+					
 					dictLink.html('<a target="_blank" href="'+link+'">'+'Wikipedia link'+'</a>');
 					dictLink.find('a').css({
 						'text-decoration':'none',
 						color: '#212121'
 					});
-	            
 
+					if(dictDesc.html() == ""){
+						dictDesc.html("No description found!");
+						dictWiki.css({
+							display: 'none'
+						});
+					} else {
+						dictWiki.css({
+							display: 'inline-block'
+						});
+					}
+
+
+					// Dictionary API request starts here
+					$.get( "http://api.pearson.com/v2/dictionaries/wordwise/entries?headword="+selectedText, function( data ) {
+					  console.log(JSON.stringify(data));
+					  var results = data.results;
+
+					  var meanings = [];
+					  for(var i=0; i<results.length; i++){
+					  	try{
+					  		meanings.push(results[i].senses[0].definition);
+					  	}catch(e){}
+					  }
+
+					  var meaningList = "";
+					  for(var i=0;i<meanings.length;i++){
+					  	console.log(meanings[i]);
+					  	if(meanings[i] == "")
+					  		continue;
+					  	meaningList = meaningList + "<li>"+meanings[i]+"</li>";
+					  }
+
+					  if(meanings.length!=0){
+					  	console.log("empty 0 here");
+
+						dictMeaning.css('display', 'inline-block');
+					  } else {
+					  	meaningList = "<li>No dictionary meaning found!</li>";
+					  	dictMeaning.css('display', 'none');
+					  }
+					  dictMeaningHead.html("Dictionary");
+					  dictMeaningList.html(meaningList);
+
+				      console.log(dictWiki.css('display') + dictMeaning.css('display'));
+
+				      mediaQuery(posX,posY);
+					});
 		        },
 		        error: function (errorMessage) {
 		        }
 		    });
-
-		    $.get( "http://api.pearson.com/v2/dictionaries/wordwise/entries?headword="+selectedText, function( data ) {
-			  console.log(JSON.stringify(data));
-			  var results = data.results;
-
-			  var meanings = [];
-			  for(var i=0; i<results.length; i++){
-			  	try{
-			  		meanings.push(results[i].senses[0].definition);
-			  	}catch(e){}
-			  }
-
-			  var meaningList = "";
-			  for(var i=0;i<meanings.length;i++){
-			  	console.log(meanings[i]);
-			  	if(meanings[i] == "")
-			  		continue;
-			  	meaningList = meaningList + "<li>"+meanings[i]+"</li>";
-			  }
-
-			dict.css({
-           		display:'inline-block',
-				top: posY+yOffset,
-				left: posX+xOffset
-			});
-
-			  if(meanings.length!=0){
-			  	console.log("empty 0 here");
-			  } else {
-			  	meaningList = "<li>No dictionary meaning found!</li>";
-			  }
-			  dictMeaningHead.html("Dictionary");
-			  dictMeaningList.html(meaningList);
-			});
 
 		}else {
 			dict.css('display', 'none');
@@ -220,10 +292,10 @@ $(document).ready(function() {
 		color: '#424242',
 		position: 'absolute',
 		'z': '10',
-		height: '30%',
+		height: '25%',
 		width: '50%',
 		'display': 'none',
-		'font-size': '1em'
+		'font-size': '0.85em'
 	});
 
 	dictWiki.css({
@@ -232,12 +304,12 @@ $(document).ready(function() {
 		width: '47%',
 		height: '100%',
 		float: 'left',
-		'overflow-x': 'scroll',
-		'overflow-y': 'scroll'
+		'overflow-x': 'auto',
+		'overflow-y': 'auto'
 	});
 
 	dictHead.css({
-		'font-size': '1.2em'
+		'font-size': '1em'
 	});
 
 	dictDesc.css({
@@ -255,12 +327,13 @@ $(document).ready(function() {
 		'margin-left': '2%',
 		float: 'right',
 		height: '100%',
-		'overflow-x': 'scroll',
-		'overflow-y': 'scroll'
+		'overflow-x': 'auto',
+		'overflow-y': 'auto',
+		'position': 'absolute'
 	});
 
 	dictMeaningHead.css({
-		'font-size': '1.2em'
+		'font-size': '1em'
 	});
 
 	dictMeaningList.css({
